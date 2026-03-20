@@ -1,0 +1,22 @@
+# Environment Variables - NEVER commit these
+.env
+
+# Node modules
+node_modules/
+
+# Test scripts
+test_gemini.js
+test_fb.js
+test_models.js
+
+# Firebase service account JSON - NEVER commit
+*.json
+!package.json
+!package-lock.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store

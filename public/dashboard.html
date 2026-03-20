@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responza AI | Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .incident-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 2rem;
+        }
+        .incident-table th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        .incident-row {
+            background: var(--card-bg);
+            transition: transform 0.2s;
+        }
+        .incident-row:hover {
+            transform: scale(1.01);
+            background: #1c1c22;
+        }
+        .incident-row td {
+            padding: 1.2rem;
+            border-top: 1px solid var(--glass);
+            border-bottom: 1px solid var(--glass);
+        }
+        .incident-row td:first-child { border-left: 1px solid var(--glass); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .incident-row td:last-child { border-right: 1px solid var(--glass); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        
+        .severity-pill {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="dashboard-container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 class="logo">Responza <span class="ai-tag">Admin</span></h1>
+                <a href="index.html" class="tag" style="text-decoration: none;">Report View</a>
+            </div>
+            <p class="tagline">Real-Time Emergency Monitoring Center</p>
+        </header>
+
+        <main>
+            <div id="stats-overview" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="info-card">
+                    <h3>Active Incidents</h3>
+                    <h2 id="active-count">0</h2>
+                </div>
+                <div class="info-card">
+                    <h3>Critical Alerts</h3>
+                    <h2 id="critical-count" style="color: var(--accent-red);">0</h2>
+                </div>
+                <div class="info-card">
+                    <h3>Last Update</h3>
+                    <h2 id="last-update" style="font-size: 1rem;">Just now</h2>
+                </div>
+            </div>
+
+            <table class="incident-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Category</th>
+                        <th>Severity</th>
+                        <th>Intent Summary</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="incident-body">
+                    <!-- Loaded dynamically -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        async function fetchIncidents() {
+            try {
+                const response = await fetch('/api/emergency/incidents');
+                const incidents = await response.json();
+                renderIncidents(incidents);
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function renderIncidents(incidents) {
+            const tbody = document.getElementById('incident-body');
+            tbody.innerHTML = '';
+            
+            let criticalCount = 0;
+            
+            incidents.forEach(inc => {
+                const row = document.createElement('tr');
+                row.className = 'incident-row';
+                
+                if (inc.severity === 'Critical') criticalCount++;
+                
+                const date = new Date(inc.createdAt?._seconds * 1000 || inc.timestamp).toLocaleTimeString();
+                
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td><strong>${inc.category}</strong></td>
+                    <td><span class="severity-pill ${inc.severity}">${inc.severity}</span></td>
+                    <td>${inc.intent}</td>
+                    <td><span class="status-dot pulsing"></span> Monitoring</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('active-count').textContent = incidents.length;
+            document.getElementById('critical-count').textContent = criticalCount;
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Poll for updates every 10 seconds
+        setInterval(fetchIncidents, 10000);
+        fetchIncidents();
+    </script>
+</body>
+</html>

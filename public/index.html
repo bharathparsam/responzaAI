@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responza AI | Emergency Response</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <header>
+            <h1 class="logo">Responza <span class="ai-tag">AI</span></h1>
+            <p class="tagline">Immediate Life-Saving Intelligence</p>
+        </header>
+
+        <main id="app-content">
+            <!-- Initial State: Report Screen -->
+            <section id="report-section" class="active">
+                <div class="input-card">
+                    <h2>Tell us what's happening</h2>
+                    <p class="instruction">Type anything. We'll handle the rest.</p>
+                    <textarea id="emergency-input" placeholder="e.g., 'There is a fire on the 3rd floor, I am trapped!' or 'Car accident at the junction'"></textarea>
+                    
+                    <div class="location-status" id="location-status">
+                        <span class="status-dot pulsing"></span> Detecting Location...
+                    </div>
+
+                    <button id="submit-btn" class="btn-primary">
+                        <span class="btn-text">REPORT EMERGENCY</span>
+                        <div class="loader" id="submit-loader" style="display: none;"></div>
+                    </button>
+                    
+                    <div class="quick-tags">
+                        <button class="tag" data-input="Fire emergency">🔥 Fire</button>
+                        <button class="tag" data-input="Medical emergency">🚑 Medical</button>
+                        <button class="tag" data-input="Accident report">🚧 Accident</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section id="processing-section" style="display: none;">
+                <div class="processing-card">
+                    <div class="spinner-large"></div>
+                    <h2>Analyzing Emergency...</h2>
+                    <p>Activating Zero-Interaction Protocol</p>
+                </div>
+            </section>
+
+            <!-- Result State: Protocol Screen -->
+            <section id="protocol-section" style="display: none;">
+                <div class="protocol-header">
+                    <div id="severity-badge" class="badge">CRITICAL</div>
+                    <h2 id="incident-category">FIRE EMERGENCY</h2>
+                </div>
+
+                <div class="protocol-grid">
+                    <div class="protocol-card immediate">
+                        <h3>🟥 IMMEDIATE (0-10s)</h3>
+                        <ul id="immediate-steps"></ul>
+                    </div>
+                    <div class="protocol-card next">
+                        <h3>🟧 NEXT (10-60s)</h3>
+                        <ul id="next-steps"></ul>
+                    </div>
+                    <div class="protocol-card trapped">
+                        <h3>🟨 IF TRAPPED</h3>
+                        <ul id="trapped-steps"></ul>
+                    </div>
+                </div>
+
+                <div class="additional-info">
+                    <div class="info-card maps">
+                        <h3>📍 NEARBY HELP</h3>
+                        <div id="nearby-services" class="services-list"></div>
+                    </div>
+                    <div class="info-card reasoning">
+                        <h3>💡 AI ASSESSMENT</h3>
+                        <p id="ai-reasoning"></p>
+                    </div>
+                </div>
+
+                <button id="reset-btn" class="btn-secondary">New Report</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Responza AI. Advisory only. Call emergency services.</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
