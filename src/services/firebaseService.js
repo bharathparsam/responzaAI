@@ -1,43 +1,36 @@
 const admin = require('firebase-admin');
 require('dotenv').config();
 
-// Option 1: Provide the path directly to the JSON file you downloaded
-const defaultPath = '/Users/bharathparsam/Downloads/bharath-prompt-wars-firebase-adminsdk-fbsvc-8272b572e4.json';
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || defaultPath;
+const localServiceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
+  '/Users/bharathparsam/Downloads/bharath-prompt-wars-firebase-adminsdk-fbsvc-8272b572e4.json';
 
-// Option 2: Individual variables
-const firestoreConfig = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')?.replace(/"/g, ''),
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-};
+const fs = require('fs');
 
 try {
-  if (serviceAccountPath) {
-    console.log('Using serviceAccountPath:', serviceAccountPath);
-    const serviceAccount = require(serviceAccountPath);
-    console.log('serviceAccount type:', typeof serviceAccount);
-    console.log('serviceAccount keys:', Object.keys(serviceAccount));
-    console.log('private_key starts with:', serviceAccount.private_key ? serviceAccount.private_key.substring(0, 30) : 'undefined');
+  if (fs.existsSync(localServiceAccountPath)) {
+    const serviceAccount = require(localServiceAccountPath);
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountPath)
+      credential: admin.credential.cert(serviceAccount)
     });
-
     console.log('Firebase Initialized Successfully (via JSON file)');
-  } else if (firestoreConfig.projectId && firestoreConfig.privateKey && firestoreConfig.clientEmail) {
-    admin.initializeApp({
-      credential: admin.credential.cert(firestoreConfig),
-    });
-    console.log('Firebase Initialized Successfully (via env vars)');
   } else {
-    console.warn('Firebase configuration incomplete. Running in no-database mode.');
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      projectId: process.env.FIREBASE_PROJECT_ID,
+    });
+    console.log('Firebase Initialized Successfully (via ADC)');
   }
 } catch (error) {
-  console.error('\\n❌ Firebase Initialization Error:', error.message);
-  console.warn('⚠️  Continuing without database...\\n');
+  console.error('❌ Firebase Initialization Error:', error.message);
+  console.warn('⚠️  Continuing without database...');
 }
 
-const db = admin.apps.length > 0 ? admin.firestore() : null;
+let db = null;
+if (admin.apps.length > 0) {
+  db = admin.firestore();
+  db.settings({ ignoreUndefinedProperties: true });
+}
+
 
 async function saveIncident(incidentData) {
   try {
